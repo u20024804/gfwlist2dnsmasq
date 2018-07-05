@@ -1,0 +1,49 @@
+#!/bin/sh
+
+## 命令行参数
+test $# -lt 2 && { echo "Usage: $0 DNS_ADDR:DNS_PORT IPSET_NAME"; exit 1; }
+dns_server="${1/:/#}"
+ipset_name="$2"
+
+## dnsmasq.gfwlist.conf 文件
+dnsmasq_conf='dnsmasq.gfwlist.conf'
+
+## 用到的临时文件
+gfwlist_txt=$(mktemp)
+gfwlist_regex=$(mktemp)
+gfwlist_scheme=$(mktemp)
+gfwlist_begin=$(mktemp)
+gfwlist_main=$(mktemp)
+gfwlist_temp=$(mktemp)
+
+## 获取 gfwlist.txt
+curl -4sSkL https://raw.github.com/gfwlist/gfwlist/master/gfwlist.txt | base64 -d | grep -Ev '^$|^!|^@@|^\[AutoProxy' > ${gfwlist_txt}
+
+## 分离不同的语法
+cat ${gfwlist_txt} | grep -E '^/' > ${gfwlist_regex}                # '/regex/' 正则
+cat ${gfwlist_txt} | grep -E '^\|\|' > ${gfwlist_scheme}            # '||pattern' 协议符
+cat ${gfwlist_txt} | grep -E '^\|[^|]' > ${gfwlist_begin}           # '|pattern' 边界符
+cat ${gfwlist_txt} | grep -Ev '^/|^\|\||^\|[^|]' > ${gfwlist_main}  # 语法较为接近的部分
+
+## 处理正则语法 (手动添加)
+echo 'edgesuite.net' >> ${gfwlist_main}
+echo -e 'blogspot.ae\nblogspot.al\nblogspot.am\nblogspot.ba\nblogspot.be\nblogspot.bg\nblogspot.bj\nblogspot.ca\nblogspot.cf\nblogspot.ch\nblogspot.cl\nblogspot.co.at\nblogspot.co.id\nblogspot.co.il\nblogspot.co.ke\nblogspot.com\nblogspot.com.ar\nblogspot.com.au\nblogspot.com.br\nblogspot.com.by\nblogspot.com.co\nblogspot.com.cy\nblogspot.com.ee\nblogspot.com.eg\nblogspot.com.es\nblogspot.com.mt\nblogspot.com.ng\nblogspot.com.tr\nblogspot.com.uy\nblogspot.co.nz\nblogspot.co.uk\nblogspot.co.za\nblogspot.cv\nblogspot.cz\nblogspot.de\nblogspot.dk\nblogspot.fi\nblogspot.fr\nblogspot.gr\nblogspot.hk\nblogspot.hr\nblogspot.hu\nblogspot.ie\nblogspot.in\nblogspot.is\nblogspot.it\nblogspot.jp\nblogspot.kr\nblogspot.li\nblogspot.lt\nblogspot.lu\nblogspot.md\nblogspot.mk\nblogspot.mr\nblogspot.mx\nblogspot.my\nblogspot.nl\nblogspot.no\nblogspot.pe\nblogspot.pt\nblogspot.qa\nblogspot.re\nblogspot.ro\nblogspot.rs\nblogspot.ru\nblogspot.se\nblogspot.sg\nblogspot.si\nblogspot.sk\nblogspot.sn\nblogspot.td\nblogspot.tw\nblogspot.ug\nblogspot.vn' >> ${gfwlist_main}
+echo -e 'google.ac\ngoogle.ad\ngoogle.ae\ngoogle.al\ngoogle.am\ngoogle.as\ngoogle.at\ngoogle.az\ngoogle.ba\ngoogle.be\ngoogle.bf\ngoogle.bg\ngoogle.bi\ngoogle.bj\ngoogle.bs\ngoogle.bt\ngoogle.by\ngoogle.ca\ngoogle.cat\ngoogle.cc\ngoogle.cd\ngoogle.cf\ngoogle.cg\ngoogle.ch\ngoogle.ci\ngoogle.cl\ngoogle.cm\ngoogle.cn\ngoogle.co.ao\ngoogle.co.bw\ngoogle.co.ck\ngoogle.co.cr\ngoogle.co.id\ngoogle.co.il\ngoogle.co.in\ngoogle.co.jp\ngoogle.co.ke\ngoogle.co.kr\ngoogle.co.ls\ngoogle.com\ngoogle.co.ma\ngoogle.com.af\ngoogle.com.ag\ngoogle.com.ai\ngoogle.com.ar\ngoogle.com.au\ngoogle.com.bd\ngoogle.com.bh\ngoogle.com.bn\ngoogle.com.bo\ngoogle.com.br\ngoogle.com.bz\ngoogle.com.co\ngoogle.com.cu\ngoogle.com.cy\ngoogle.com.do\ngoogle.com.ec\ngoogle.com.eg\ngoogle.com.et\ngoogle.com.fj\ngoogle.com.gh\ngoogle.com.gi\ngoogle.com.gt\ngoogle.com.hk\ngoogle.com.jm\ngoogle.com.kh\ngoogle.com.kw\ngoogle.com.lb\ngoogle.com.lc\ngoogle.com.ly\ngoogle.com.mm\ngoogle.com.mt\ngoogle.com.mx\ngoogle.com.my\ngoogle.com.na\ngoogle.com.nf\ngoogle.com.ng\ngoogle.com.ni\ngoogle.com.np\ngoogle.com.om\ngoogle.com.pa\ngoogle.com.pe\ngoogle.com.pg\ngoogle.com.ph\ngoogle.com.pk\ngoogle.com.pr\ngoogle.com.py\ngoogle.com.qa\ngoogle.com.sa\ngoogle.com.sb\ngoogle.com.sg\ngoogle.com.sl\ngoogle.com.sv\ngoogle.com.tj\ngoogle.com.tr\ngoogle.com.tw\ngoogle.com.ua\ngoogle.com.uy\ngoogle.com.vc\ngoogle.com.vn\ngoogle.co.mz\ngoogle.co.nz\ngoogle.co.th\ngoogle.co.tz\ngoogle.co.ug\ngoogle.co.uk\ngoogle.co.uz\ngoogle.co.ve\ngoogle.co.vi\ngoogle.co.za\ngoogle.co.zm\ngoogle.co.zw\ngoogle.cv\ngoogle.cz\ngoogle.de\ngoogle.dj\ngoogle.dk\ngoogle.dm\ngoogle.dz\ngoogle.ee\ngoogle.es\ngoogle.fi\ngoogle.fm\ngoogle.fr\ngoogle.ga\ngoogle.ge\ngoogle.gf\ngoogle.gg\ngoogle.gl\ngoogle.gm\ngoogle.gp\ngoogle.gr\ngoogle.gy\ngoogle.hn\ngoogle.hr\ngoogle.ht\ngoogle.hu\ngoogle.ie\ngoogle.im\ngoogle.io\ngoogle.iq\ngoogle.is\ngoogle.it\ngoogle.je\ngoogle.jo\ngoogle.kg\ngoogle.ki\ngoogle.kz\ngoogle.la\ngoogle.li\ngoogle.lk\ngoogle.lt\ngoogle.lu\ngoogle.lv\ngoogle.md\ngoogle.me\ngoogle.mg\ngoogle.mk\ngoogle.ml\ngoogle.mn\ngoogle.ms\ngoogle.mu\ngoogle.mv\ngoogle.mw\ngoogle.ne\ngoogle.net\ngoogle.nl\ngoogle.no\ngoogle.nr\ngoogle.nu\ngoogle.org\ngoogle.pl\ngoogle.pn\ngoogle.ps\ngoogle.pt\ngoogle.ro\ngoogle.rs\ngoogle.ru\ngoogle.rw\ngoogle.sc\ngoogle.se\ngoogle.sh\ngoogle.si\ngoogle.sk\ngoogle.sm\ngoogle.sn\ngoogle.so\ngoogle.sr\ngoogle.st\ngoogle.td\ngoogle.tg\ngoogle.tk\ngoogle.tl\ngoogle.tm\ngoogle.tn\ngoogle.to\ngoogle.tt\ngoogle.vg\ngoogle.vu\ngoogle.ws' >> ${gfwlist_main}
+
+## 处理协议符，直接删除，privoxy 中没有协议字段
+cat ${gfwlist_scheme} | sed -r 's@^\|\|(.+)$@\1@g' >> ${gfwlist_main}
+
+## 处理边界符，直接删除，然后删除可能有的协议字段
+cat ${gfwlist_begin} | sed -r 's@^\|(.+)$@\1@g; s@^https?:/?/?(.*)$@\1@g' >> ${gfwlist_main}
+
+## 处理 gfwlist_main 文件，去除 uri 等杂项，只要域名
+cat ${gfwlist_main} |
+    grep -Ev '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(:[0-9]+)?$|^\s*$' |
+    sed -r '/^\s*q%3[dD]/d; s@^([^/%]*).*$@\1@g; s@^[^*]*\*[^.]*\.(.*)$@\1@g; s@^(.*)\.?\*[^.*]*$@\1@g; s@^\.|\.$@@g' |
+    sort | uniq -i >> ${dnsmasq_conf}
+
+## 生成 dnsmasq.gfwlist.conf
+sed -ri "s@.*@server=/\0/$dns_server\nipset=/\0/$ipset_name@g" ${dnsmasq_conf}
+
+## 处理完毕，删除临时文件
+rm -fr ${gfwlist_txt} ${gfwlist_regex} ${gfwlist_scheme} ${gfwlist_begin} ${gfwlist_main} ${gfwlist_temp}
