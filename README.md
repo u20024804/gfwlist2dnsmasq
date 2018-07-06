@@ -14,6 +14,6 @@
 
 ## 成品下载
 如果你没有运行 gfwlist2dnsmasq 脚本的条件，也可以从下面的 URL 获取它（6 小时更新一次）
-- gfwlist domain lists：https://zfl9.github.io/gfwlist2dnsmasq/domain_list.txt
-- dnsmasq without ipset：https://zfl9.github.io/gfwlist2dnsmasq/dnsmasq_gfwlist.conf
-- dnsmasq with ipset：https://zfl9.github.io/gfwlist2dnsmasq/dnsmasq_gfwlist_ipset.conf
+- gfwlist domain lists：<a href="https://zfl9.github.io/gfwlist2dnsmasq/domain_list.txt" download>https://zfl9.github.io/gfwlist2dnsmasq/domain_list.txt</a>
+- dnsmasq without ipset：<a href="https://zfl9.github.io/gfwlist2dnsmasq/dnsmasq_gfwlist.conf" download>https://zfl9.github.io/gfwlist2dnsmasq/dnsmasq_gfwlist.conf</a>
+- dnsmasq with ipset：<a href="https://zfl9.github.io/gfwlist2dnsmasq/dnsmasq_gfwlist_ipset.conf" download>https://zfl9.github.io/gfwlist2dnsmasq/dnsmasq_gfwlist_ipset.conf</a>
