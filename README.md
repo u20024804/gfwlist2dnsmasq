@@ -9,7 +9,7 @@
 - `-s <addr>`：用于解析 gfwlist 域名的 dns 服务器地址，参数可选，默认为 127.0.0.1
 - `-p <port>`：用于解析 gfwlist 域名的 dns 服务器端口，参数可选，默认为 60053
 - `-n <name>`：将解析到的 IP 地址存放至指定的 ipset，如果未指定，则不生成 ipset 选项
-- `-l`：生成 gfwlist 域名列表，而非 dnsmasq 配置文件，指定此选项时其它选项将会被忽略
+- `-l`：生成 gfwlist 域名列表，而非 dnsmasq 配置文件，指定此选项时其它选项将被忽略
 - `-h`：查看 gfwlist2dnsmasq 脚本的帮助信息，然后退出脚本
 
 ## 成品下载
